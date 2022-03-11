@@ -32,7 +32,7 @@ class MethodChannelWebViewPlatform implements WebViewPlatformController {
   static const MethodChannel _cookieManagerChannel =
       MethodChannel('plugins.flutter.io/cookie_manager');
 
-  Future<bool?> _onMethodCall(MethodCall call) async {
+  Future<dynamic> _onMethodCall(MethodCall call) async {
     switch (call.method) {
       case 'javascriptChannelMessage':
         final String channel = call.arguments['channel']! as String;
@@ -55,6 +55,31 @@ class MethodChannelWebViewPlatform implements WebViewPlatformController {
         _platformCallbacksHandler
             .onPageStarted(call.arguments['url']! as String);
         return null;
+      case 'onJsAlert':
+        if (_platformCallbacksHandler.onJsAlert != null) {
+          await _platformCallbacksHandler.onJsAlert(
+            call.arguments['url'] as String,
+            call.arguments['message'] as String,
+          );
+        }
+        return null;
+      case 'onJsConfirm':
+        if (_platformCallbacksHandler.onJsConfirm != null) {
+          return await _platformCallbacksHandler.onJsConfirm(
+            call.arguments['url'] as String,
+            call.arguments['message'] as String,
+          );
+        }
+        return false;
+      case 'onJsPrompt':
+        if (_platformCallbacksHandler.onJsPrompt != null) {
+          return await _platformCallbacksHandler.onJsPrompt(
+            call.arguments['url'] as String,
+            call.arguments['message'] as String,
+            call.arguments['defaultText'] as String,
+          );
+        }
+        return '';
       case 'onWebResourceError':
         _platformCallbacksHandler.onWebResourceError(
           WebResourceError(

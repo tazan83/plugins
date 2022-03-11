@@ -36,6 +36,16 @@ typedef PageFinishedCallback = void Function(String url);
 /// Signature for when a [WebView] is loading a page.
 typedef PageLoadingCallback = void Function(int progress);
 
+/// Signature for when a page fire an Alert dialog by JavaScript.
+typedef JsAlertCallback = Future<void> Function(String url, String message);
+
+/// Signature for when a page fire an Confirm dialog by JavaScript.
+typedef JsConfirmCallback = Future<bool> Function(String url, String message);
+
+/// Signature for when a page fire an Prompt dialog by JavaScript.
+typedef JsPromptCallback = Future<String> Function(
+    String url, String message, String defaultText);
+
 /// Signature for when a [WebView] has failed to load a resource.
 typedef WebResourceErrorCallback = void Function(WebResourceError error);
 
@@ -62,6 +72,9 @@ class WebView extends StatefulWidget {
     this.gestureRecognizers,
     this.onPageStarted,
     this.onPageFinished,
+    this.onJsAlert,
+    this.onJsConfirm,
+    this.onJsPrompt,
     this.onProgress,
     this.onWebResourceError,
     this.debuggingEnabled = false,
@@ -180,6 +193,24 @@ class WebView extends StatefulWidget {
 
   /// Invoked when a page is loading.
   final PageLoadingCallback? onProgress;
+
+  /// Invoked when a page fire an Alert dialog by JavaScript.
+  ///
+  /// You have to implement your Alert dialog on your own way.
+  /// Default value will consumed dialog callback.
+  final JsAlertCallback? onJsAlert;
+
+  /// Invoked when a page fire an Confirm dialog by JavaScript.
+  ///
+  /// You have to implement your Confirm dialog on your own way.
+  /// Default value will consumed dialog callback.
+  final JsConfirmCallback? onJsConfirm;
+
+  /// Invoked when a page fire an Prompt dialog by JavaScript.
+  ///
+  /// You have to implement your Prompt dialog on your own way.
+  /// Default value will consumed dialog callback.
+  final JsPromptCallback? onJsPrompt;
 
   /// Invoked when a web resource has failed to load.
   ///
@@ -658,6 +689,30 @@ class _PlatformCallbacksHandler implements WebViewPlatformCallbacksHandler {
     if (_webView.onPageFinished != null) {
       _webView.onPageFinished!(url);
     }
+  }
+
+  @override
+  Future<void> onJsAlert(String url, String message) async {
+    if (_webView.onJsAlert != null) {
+      _webView.onJsAlert!(url, message);
+    }
+  }
+
+  @override
+  Future<bool> onJsConfirm(String url, String message) async {
+    if (_webView.onJsConfirm != null) {
+      return await _webView.onJsConfirm!(url, message);
+    }
+    return false;
+  }
+
+  @override
+  Future<String> onJsPrompt(
+      String url, String message, String defaultText) async {
+    if (_webView.onJsPrompt != null) {
+      return await _webView.onJsPrompt!(url, message, defaultText);
+    }
+    return '';
   }
 
   @override

@@ -709,4 +709,48 @@
   return nil;
 }
 
+- (void)webView:(WKWebView *)webView runJavaScriptAlertPanelWithMessage:(NSString *)message initiatedByFrame:(WKFrameInfo *)frame completionHandler:(void (^)(void))completionHandler {
+    [_channel invokeMethod:@"onJsAlert"
+                       arguments:@{
+                           @"url": webView.URL.absoluteString,
+                           @"message": message
+                       }
+                          result:^(id  _Nullable result) {
+        completionHandler();
+    }];
+}
+
+- (void)webView:(WKWebView *)webView runJavaScriptConfirmPanelWithMessage:(NSString *)message initiatedByFrame:(WKFrameInfo *)frame completionHandler:(void (^)(BOOL result))completionHandler {
+    [_channel invokeMethod:@"onJsConfirm"
+                       arguments:@{
+                           @"url": webView.URL.absoluteString,
+                           @"message": message
+                       }
+                          result:^(id  _Nullable result) {
+        if ([result isKindOfClass:[NSNumber class]]) {
+            NSNumber* b = result;
+            completionHandler([b boolValue]);
+            return;
+        }
+        completionHandler(NO);
+    }];
+}
+
+- (void)webView:(WKWebView *)webView runJavaScriptTextInputPanelWithPrompt:(NSString *)prompt defaultText:(NSString *)defaultText initiatedByFrame:(WKFrameInfo *)frame completionHandler:(void (^)(NSString *result))completionHandler {
+    [_channel invokeMethod:@"onJsPrompt"
+                       arguments:@{
+                           @"url": webView.URL.absoluteString,
+                           @"message": prompt,
+                           @"defaultText": defaultText
+                       }
+                          result:^(id  _Nullable result) {
+        if ([result isKindOfClass: [NSString class]]) {
+            NSString *str = result;
+            completionHandler(str);
+            return;
+        }
+        completionHandler(@"");
+    }];
+}
+
 @end
