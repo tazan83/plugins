@@ -27,7 +27,7 @@ abstract class WebViewPlatformCallbacksHandler {
   ///
   /// Return a future.
   /// Fulfill the returned future when dialog closed.
-  Future<void> onJsAlert(String url, String message);
+  Future<bool> onJsAlert(String url, String message);
 
   /// Invoked by [WebViewPlatformController] when page fire an Confirm dialog from JavaScript.
   ///

@@ -57,12 +57,12 @@ class MethodChannelWebViewPlatform implements WebViewPlatformController {
         return null;
       case 'onJsAlert':
         if (_platformCallbacksHandler.onJsAlert != null) {
-          await _platformCallbacksHandler.onJsAlert(
+          return await _platformCallbacksHandler.onJsAlert(
             call.arguments['url'] as String,
             call.arguments['message'] as String,
           );
         }
-        return null;
+        return false;
       case 'onJsConfirm':
         if (_platformCallbacksHandler.onJsConfirm != null) {
           return await _platformCallbacksHandler.onJsConfirm(

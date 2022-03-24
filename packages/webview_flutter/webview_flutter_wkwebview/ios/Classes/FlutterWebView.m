@@ -709,14 +709,17 @@
   return nil;
 }
 
-- (void)webView:(WKWebView *)webView runJavaScriptAlertPanelWithMessage:(NSString *)message initiatedByFrame:(WKFrameInfo *)frame completionHandler:(void (^)(void))completionHandler {
+- (void)webView:(WKWebView *)webView runJavaScriptAlertPanelWithMessage:(NSString *)message initiatedByFrame:(WKFrameInfo *)frame completionHandler:(void (^)(BOOL result))completionHandler {
     [_channel invokeMethod:@"onJsAlert"
                        arguments:@{
                            @"url": webView.URL.absoluteString,
                            @"message": message
                        }
                           result:^(id  _Nullable result) {
-        completionHandler();
+        if ([result isKindOfClass:[NSNumber class]]) {
+            completionHandler(YES);
+            return;
+        }
     }];
 }
 

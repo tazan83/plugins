@@ -37,7 +37,7 @@ typedef PageFinishedCallback = void Function(String url);
 typedef PageLoadingCallback = void Function(int progress);
 
 /// Signature for when a page fire an Alert dialog by JavaScript.
-typedef JsAlertCallback = Future<void> Function(String url, String message);
+typedef JsAlertCallback = Future<bool> Function(String url, String message);
 
 /// Signature for when a page fire an Confirm dialog by JavaScript.
 typedef JsConfirmCallback = Future<bool> Function(String url, String message);
@@ -692,10 +692,11 @@ class _PlatformCallbacksHandler implements WebViewPlatformCallbacksHandler {
   }
 
   @override
-  Future<void> onJsAlert(String url, String message) async {
+  Future<bool> onJsAlert(String url, String message) async {
     if (_webView.onJsAlert != null) {
-      _webView.onJsAlert!(url, message);
+      return await _webView.onJsAlert!(url, message);
     }
+    return false;
   }
 
   @override
