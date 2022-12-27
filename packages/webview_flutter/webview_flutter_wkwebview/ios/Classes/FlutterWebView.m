@@ -97,6 +97,9 @@
     NSDictionary<NSString *, id> *settings = args[@"settings"];
 
     WKWebViewConfiguration *configuration = [[WKWebViewConfiguration alloc] init];
+    // SWH - 자바스크립트에서 새창 열기 허용 >>
+    configuration.preferences.javaScriptCanOpenWindowsAutomatically = YES;
+    // <<
     [self applyConfigurationSettings:settings toConfiguration:configuration];
     configuration.userContentController = userContentController;
     [self updateAutoMediaPlaybackPolicy:args[@"autoMediaPlaybackPolicy"]
